@@ -176,9 +176,10 @@ int main(int argc, char **argv) {
             transform(filepath.begin(), filepath.end(), filepath.begin(), ::tolower);
 
             if (
-                    filepath.find(L"\\lod\\") == std::string::npos &&
-                    filepath.find(L"\\textures\\dyndolod\\") == std::string::npos &&
-                    hasEnding(filepath, L".dds")
+                    filepath.find(L"\\lod\\") == std::string::npos && // lods in lod folder
+                    filepath.find(L"\\textures\\dyndolod\\") == std::string::npos && // lods in dyndolod folder
+                    std::count(filepath.begin(), filepath.end(), L'.') < 4 && // lods that have x.y.z.dds format
+                    hasEnding(filepath, L".dds") // and finally check that it's a texture
                     ) {
                 uint32_t size = texsize;
                 if (hasEnding(filepath, L"_n.dds")) {
