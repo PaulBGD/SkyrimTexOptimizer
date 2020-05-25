@@ -4,6 +4,7 @@ project(STO)
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory("libs/DirectXTex")
+add_subdirectory(libs/NIF)
 
-add_executable(STO main.cpp textures.cpp textures.hpp pikosha2.h sha2_512_256.h)
-target_link_libraries(STO PRIVATE directxtex)
+add_executable(STO main.cpp textures.cpp textures.hpp sha2_512_256.h processor.cpp processor.h)
+target_link_libraries(STO PRIVATE directxtex nif)
