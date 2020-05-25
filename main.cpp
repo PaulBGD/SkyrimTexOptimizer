@@ -131,7 +131,8 @@ void processor(struct ThreadData data) {
 
         std::cout << "Processed " << file.entry << " on thread #" << data.threadNum << "!";
         info = opt.getInfo();
-        std::cout << " Resized from " << previousWidth << "/" << previousHeight << " to " << info.width << "/" << info.height << std::endl;
+        std::cout << " Resized from " << previousWidth << "/" << previousHeight << " to " << info.width << "/"
+                  << info.height << std::endl;
     }
 }
 
@@ -169,39 +170,28 @@ int main(int argc, char **argv) {
 
     while (iter != end) {
         if (iter->is_regular_file()) {
-            std::filesystem::path path;
-            bool good = false;
-            try {
-                path = iter->path();
-                good = true;
-            } catch (const std::exception &exc) {
-                std::cerr << "Exception:" << exc.what() << std::endl;
-            } catch (...) {
-                std::cerr << "Unknown Exception" << std::endl;
-            }
+            std::filesystem::path path = iter->path();
 
-            if (good) {
-                std::wstring filepath = path.wstring();
-                transform(filepath.begin(), filepath.end(), filepath.begin(), ::tolower);
+            std::wstring filepath = path.wstring();
+            transform(filepath.begin(), filepath.end(), filepath.begin(), ::tolower);
 
-                if (
-                        filepath.find(L"\\lod\\") == std::string::npos &&
-                        filepath.find(L"\\textures\\dyndolod\\") == std::string::npos &&
-                        hasEnding(filepath, L".dds")
-                        ) {
-                    uint32_t size = texsize;
-                    if (hasEnding(filepath, L"_n.dds")) {
-                        size = normalsize;
-                    }
-                    std::filesystem::path relative = path.lexically_relative(input);
-                    struct InputFile file{
-                            path,
-                            std::filesystem::path(output).append(relative.string()),
-                            relative.string(),
-                            size
-                    };
-                    queue.push(file);
+            if (
+                    filepath.find(L"\\lod\\") == std::string::npos &&
+                    filepath.find(L"\\textures\\dyndolod\\") == std::string::npos &&
+                    hasEnding(filepath, L".dds")
+                    ) {
+                uint32_t size = texsize;
+                if (hasEnding(filepath, L"_n.dds")) {
+                    size = normalsize;
                 }
+                std::filesystem::path relative = path.lexically_relative(input);
+                struct InputFile file{
+                        path,
+                        std::filesystem::path(output).append(relative.string()),
+                        relative.string(),
+                        size
+                };
+                queue.push(file);
             }
         }
 
