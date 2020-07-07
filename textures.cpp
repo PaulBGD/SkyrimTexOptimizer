@@ -229,6 +229,38 @@ bool TexturesOptimizer::open(const std::string &filePath, const TextureType &typ
     return false;
 }
 
+bool TexturesOptimizer::read(const std::string& filePath, const char *data, const size_t length, const TextureType &type) {
+    _image.reset(new(std::nothrow) DirectX::ScratchImage);
+    if (!_image)
+        return false;
+
+    modifiedCurrentTexture = false;
+
+    HRESULT hr = S_FALSE;
+    switch (type) {
+        case DDS:
+            const DWORD ddsFlags = DirectX::DDS_FLAGS_NONE;
+            hr = LoadFromDDSMemory(data, length, ddsFlags, &_info, *_image);
+            if (FAILED(hr))
+                return false;
+
+            if (DirectX::IsTypeless(_info.format)) {
+                _info.format = DirectX::MakeTypelessUNORM(_info.format);
+
+                if (DirectX::IsTypeless(_info.format))
+                    return false;
+
+                _image->OverrideFormat(_info.format);
+            }
+    }
+    if (SUCCEEDED(hr)) {
+        _type = type;
+        _name = filePath;
+        return true;
+    }
+    return false;
+}
+
 bool TexturesOptimizer::decompress() {
     if (!DirectX::IsCompressed(_info.format))
         return false;

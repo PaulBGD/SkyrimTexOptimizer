@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.15)
 add_compile_options(/bigobj)
 
 add_library(nif STATIC
+        ctre.hpp
         Animation.cpp
         Animation.h
         BasicTypes.cpp

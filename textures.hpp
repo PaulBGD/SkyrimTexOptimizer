@@ -86,6 +86,8 @@ public:
 
     bool modifiedCurrentTexture = false;
 
+    bool read(const std::string& filePath, const char *data, size_t length, const TextureType &type);
+
 private:
     std::unique_ptr<DirectX::ScratchImage> _image{};
     DirectX::TexMetadata _info{};
