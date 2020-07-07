@@ -6,6 +6,7 @@ See the included LICENSE file
 #pragma once
 
 #include "Factory.h"
+#include "ctre.hpp"
 
 struct OptOptions {
 	NiVersion targetVersion;
@@ -77,6 +78,7 @@ public:
 
 	int Load(const std::string& fileName, const NifLoadOptions& options = NifLoadOptions());
 	int Load(std::fstream& file, const NifLoadOptions& options = NifLoadOptions());
+    int Load(std::iostream& file, const NifLoadOptions& options = NifLoadOptions());
 	int Save(const std::string& fileName, const NifSaveOptions& options = NifSaveOptions());
 	int Save(std::fstream& file, const NifSaveOptions& options = NifSaveOptions());
 

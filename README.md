@@ -39,6 +39,7 @@ That probably should get checked out soon, it's somewhere in the doCPUWork logic
 - A GUI in which the user can specify input/output directories and rules based off file and directory location.
 - A configuration format that can be imported/exported, allowing users to share rules.
 - In the future I would like to support fixing broken meshes, with potentially some levels of optimization.
+- Also there's multiple memory leaks in the NIF library, many `new` calls without matching `delete` calls.
 
 ## Thanks
 

@@ -221,6 +221,53 @@ int NifFile::Load(std::fstream& file, const NifLoadOptions& options) {
 	return 0;
 }
 
+int NifFile::Load(std::iostream& file, const NifLoadOptions& options) {
+    Clear();
+
+    isTerrain = options.isTerrain;
+
+    NiStream stream(&file, &hdr.GetVersion());
+    hdr.Get(stream);
+
+    if (!hdr.IsValid()) {
+        Clear();
+        return 1;
+    }
+
+    NiVersion& version = stream.GetVersion();
+    if (!(version.File() >= NiVersion::ToFile(20, 2, 0, 7) && (version.User() == 11 || version.User() == 12))) {
+        Clear();
+        return 2;
+    }
+
+    uint nBlocks = hdr.GetNumBlocks();
+    blocks.resize(nBlocks);
+
+    auto& nifactories = NiFactoryRegister::Get();
+    for (int i = 0; i < nBlocks; i++) {
+        NiObject* block = nullptr;
+        std::string blockTypeStr = hdr.GetBlockTypeStringById(i);
+
+        auto nifactory = nifactories.GetFactoryByName(blockTypeStr);
+        if (nifactory) {
+            block = nifactory->Load(stream);
+        }
+        else {
+            hasUnknown = true;
+            block = new NiUnknown(stream, hdr.GetBlockSize(i));
+        }
+
+        if (block)
+            blocks[i] = std::move(std::unique_ptr<NiObject>(block));
+    }
+
+    hdr.SetBlockReference(&blocks);
+
+    PrepareData();
+    isValid = true;
+    return 0;
+}
+
 void NifFile::SetShapeOrder(const std::vector<std::string>& order) {
 	if (hasUnknown)
 		return;
@@ -680,6 +727,8 @@ void NifFile::SetTextureSlot(NiShader* shader, std::string& outTexFile, int texI
 
 	textureSet->textures[texIndex].SetString(outTexFile);
 }
+
+static constexpr auto RemoveMultipleSlashes = ctll::fixed_string{ "/+|\\\\+" };
 
 void NifFile::TrimTexturePaths() {
 	auto fTrimPath = [&isTerrain = isTerrain](std::string& tex) -> std::string& {

@@ -75,7 +75,9 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4005)
-#define NOMINMAX
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
 #define NODRAWTEXT
 #define NOGDI
 #define NOBITMAP
